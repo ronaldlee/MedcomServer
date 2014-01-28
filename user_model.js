@@ -25,6 +25,25 @@ UserModel.prototype.addUser = function(phone,openudid,callingcode,endCallback) {
   });
 };
 
+UserModel.prototype.updateAvatarURL = function(user_id,avatar_url,endCallback) {
+  var sql="update user set avatar_url='"+avatar_url+"' where user_id='"+user_id+"'";
+console.log("inert query: " + sql);
+  this.pool.getConnection(function(err, connection) {
+    connection.query(sql, function(err, result) {
+       connection.release();
+       if (err) {
+         console.log("err: " + JSON.stringify(err));
+         endCallback(null);
+         return;
+       }
+//console.log("add user result: " + JSON.stringify(result));
+       var user_id = result.insertId;
+
+       endCallback(user_id);
+    });
+  });
+};
+
 UserModel.prototype.checkUser = function(phone,callback,index,endCallback) {
   //var sql="select user_id,name,phone from user where name='"+name+"' and phone='"+phone+"'";
   //var sql="select user_id,name,phone from user where phone='"+phone+"'";

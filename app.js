@@ -240,35 +240,53 @@ app.post('/checkUsersByContacts', function(req, res){
 });
 
 app.post('/uploadAvatarImage', function (req, res) {
-    if (req.query == undefined || req.query.user_id == undefined ||
-        req.query.pwd == undefined || req.query.pwd != "whatIdummy") return;
+  if (req.query == undefined || req.query.user_id == undefined ||
+      req.query.pwd == undefined || req.query.pwd != "whatIdummy") return;
 
-    //console.error("uploadAvatarImage: req.query.user_id: " + req.query.user_id);
-    //console.error("uploadAvatarImage: req.files: " + JSON.stringify(req.files));
-
-    var tempPath = req.files.file.path;
-    var targetFilename = '/home/ubuntu/public/uploads/'+req.files.file.name;
-
-    console.error("upload tempfile: " + tempPath + "; target file: " + targetFilename);
-
-    var targetPath = path.resolve(targetFilename);
-
-    if (path.extname(req.files.file.name).toLowerCase() === '.png') {
-        fs.rename(tempPath, targetPath, function(err) {
-            if (err) {
-              console.log("upload error: " + err);
-              throw err;
-            }
-            
-            //update user avatar url in database
-            console.log("Upload completed!");
-        });
-    } else {
-        fs.unlink(tempPath, function () {
-            if (err) throw err;
-            console.error("Only .png files are allowed!");
-        });
+  var endCallback = function(user_id) {
+    var response = {};
+    response['code'] = "0";
+    if (!user_id) {
+      response['code'] = "-1";
     }
+    var body = JSON.stringify(response);
+
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Content-Length', Buffer.byteLength(body));
+    res.end(body);
+  }
+  //console.error("uploadAvatarImage: req.query.user_id: " + req.query.user_id);
+  //console.error("uploadAvatarImage: req.files: " + JSON.stringify(req.files));
+
+  var tempPath = req.files.file.path;
+  var targetFilename = '/home/ubuntu/public/uploads/'+req.files.file.name;
+
+  console.error("upload tempfile: " + tempPath + "; target file: " + targetFilename);
+
+  var targetPath = path.resolve(targetFilename);
+
+  if (path.extname(req.files.file.name).toLowerCase() === '.png') {
+    fs.rename(tempPath, targetPath, function(err) {
+      if (err) {
+        console.log("upload error: " + err);
+        endCallback(null);
+        return;
+      }
+            
+      userModel.updateAvatarURL(req.query.user_id,"http://54.213.19.254:6699/uploads/"+req.files.file.name,endCallback);
+      //update user avatar url in database
+      console.log("Upload completed!");
+    });
+  } else {
+    fs.unlink(tempPath, function () {
+      if (err) {
+        endCallback(null);
+        return;
+      }
+      console.error("Only .png files are allowed!");
+      endCallback(null);
+    });
+  }
 });
 
 
