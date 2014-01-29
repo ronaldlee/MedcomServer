@@ -265,7 +265,9 @@ app.post('/uploadAvatarImage', function (req, res) {
   if (req.query == undefined || req.query.user_id == undefined ||
       req.query.pwd == undefined || req.query.pwd != "whatIdummy") return;
 
+  console.log("call uploadAvatarImage");
   var endCallback = function(user_id) {
+    console.log("call endCallback");
     var response = {};
     response['code'] = "0";
     if (!user_id) {
@@ -280,34 +282,60 @@ app.post('/uploadAvatarImage', function (req, res) {
   //console.error("uploadAvatarImage: req.query.user_id: " + req.query.user_id);
   //console.error("uploadAvatarImage: req.files: " + JSON.stringify(req.files));
 
-  var tempPath = req.files.file.path;
-  var targetFilename = '/home/ubuntu/public/uploads/'+req.files.file.name;
+  var updateFunction = function() {
+    console.log("execute updateFunction");
+    var tempPath = req.files.file.path;
+    var targetFilename = '/home/ubuntu/public/uploads/'+req.files.file.name;
 
-  console.error("upload tempfile: " + tempPath + "; target file: " + targetFilename);
+    console.error("upload tempfile: " + tempPath + "; target file: " + targetFilename);
 
-  var targetPath = path.resolve(targetFilename);
+    var targetPath = path.resolve(targetFilename);
 
-  if (path.extname(req.files.file.name).toLowerCase() === '.png') {
-    fs.rename(tempPath, targetPath, function(err) {
-      if (err) {
-        console.log("upload error: " + err);
+    if (path.extname(req.files.file.name).toLowerCase() === '.png') {
+      fs.rename(tempPath, targetPath, function(err) {
+        if (err) {
+          console.log("upload error: " + err);
+          endCallback(null);
+          return;
+        }
+        userModel.updateAvatarURL(req.query.user_id,"http://54.213.19.254:6699/uploads/"+req.files.file.name,endCallback);
+        //update user avatar url in database
+        console.log("Upload completed!");
+      });
+    } else {
+      fs.unlink(tempPath, function () {
+        if (err) {
+          endCallback(null);
+          return;
+        }
+        console.error("Only .png files are allowed!");
         endCallback(null);
-        return;
-      }
-      userModel.updateAvatarURL(req.query.user_id,"http://54.213.19.254:6699/uploads/"+req.files.file.name,endCallback);
-      //update user avatar url in database
-      console.log("Upload completed!");
-    });
-  } else {
-    fs.unlink(tempPath, function () {
-      if (err) {
-        endCallback(null);
-        return;
-      }
-      console.error("Only .png files are allowed!");
-      endCallback(null);
-    });
+      });
+    }
   }
+
+  var checkEndCallback = function(isEmptyAvatarUrl) {
+    console.log("call checkEndCallback");
+    if (isEmptyAvatarUrl == true) {
+      console.log(" --isEmptyAvatarUrl is true: call updateFunction");
+      //do update
+      updateFunction();
+    }
+    else {
+      console.log(" --isEmptyAvatarUrl is false: call endCallback");
+      endCallback();
+    }
+  }
+
+  if (req.query.only_is_empty && req.query.only_is_empty=="true") {
+    console.log("calling userModel.checkIsEmptyAvatarUrl");
+    userModel.checkIsEmptyAvatarUrl(req.query.user_id,checkEndCallback);
+  }
+  else {
+    console.log("calling updateFunction");
+    updateFunction();
+  }
+
 });
 
 
