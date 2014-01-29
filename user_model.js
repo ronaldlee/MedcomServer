@@ -27,7 +27,8 @@ UserModel.prototype.addUser = function(phone,openudid,callingcode,endCallback) {
 
 UserModel.prototype.updateAvatarURL = function(user_id,avatar_url,endCallback) {
   var sql="update user set avatar_url='"+avatar_url+"' where user_id='"+user_id+"'";
-console.log("inert query: " + sql);
+
+  console.log("update avatar url query: " + sql);
   this.pool.getConnection(function(err, connection) {
     connection.query(sql, function(err, result) {
        connection.release();
@@ -91,6 +92,27 @@ UserModel.prototype.getPhoneByUserID = function(user_id,callback) {
       }
       else {
         callback(rows[0]['phone']);     
+      }
+    });
+  });
+};
+
+UserModel.prototype.getUserByUserID = function(user_id,callback) {
+  var sql="select * from user where user_id='"+user_id+"'";
+
+  this.pool.getConnection(function(err, connection) {
+    connection.query(sql, function(err, rows) {
+      connection.release();
+      if (err) {
+        console.log("err: " + JSON.stringify(err));
+        callback(null);
+        return;
+      }
+      if (rows.length != 1) {
+        callback(null);     
+      }
+      else {
+        callback(rows[0]);     
       }
     });
   });

@@ -99,6 +99,28 @@ app.post('/getPhoneByUserID',function(req,res) {
   userModel.getPhoneByUserID(userid,endCallback);
 });
 
+app.post('/getUser',function(req,res) {
+  console.log(getFormattedCurrentDate()+":getUser: " + JSON.stringify(req.body));
+
+  var userid= req.body.userid;
+
+  var endCallback = function(user) {
+    var response = {};
+    response['code'] = "0";
+    if (!phone) {
+      response['code'] = "-1";
+    }
+    response['user'] = user;
+    var body = JSON.stringify(response);
+
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Content-Length', Buffer.byteLength(body));
+    res.end(body);
+  }
+
+  userModel.getUserByUserID(userid,endCallback);
+});
+
 app.post('/checkUsersByContactsWithOpenUDID', function(req, res){
   console.log(getFormattedCurrentDate()+":checkUsersByContactsWithOpenUDID: " + JSON.stringify(req.body));
 
@@ -272,7 +294,6 @@ app.post('/uploadAvatarImage', function (req, res) {
         endCallback(null);
         return;
       }
-            
       userModel.updateAvatarURL(req.query.user_id,"http://54.213.19.254:6699/uploads/"+req.files.file.name,endCallback);
       //update user avatar url in database
       console.log("Upload completed!");
