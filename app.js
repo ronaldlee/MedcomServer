@@ -261,9 +261,34 @@ app.post('/checkUsersByContacts', function(req, res){
 
 });
 
+app.post('/clearAvatarImage', function (req, res) {
+  console.log("call clearAvatarImage");
+
+  var endCallback = function(user_id) {
+    console.log("call endCallback");
+    var response = {};
+    response['code'] = "0";
+    if (!user_id) {
+      response['code'] = "-1";
+    }
+    var body = JSON.stringify(response);
+
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Content-Length', Buffer.byteLength(body));
+    res.end(body);
+  }
+
+  if (req.body == undefined || req.body.userid == undefined ||
+      req.body.pwd == undefined || req.body.pwd != "whatIdummy") {
+    console.log("bad params");
+    endCallback(null);
+    return;
+  }
+
+  userModel.updateAvatarURL(req.body.userid,"",endCallback);
+});
+
 app.post('/uploadAvatarImage', function (req, res) {
-  if (req.query == undefined || req.query.user_id == undefined ||
-      req.query.pwd == undefined || req.query.pwd != "whatIdummy") return;
 
   console.log("call uploadAvatarImage");
   var endCallback = function(user_id) {
@@ -279,7 +304,13 @@ app.post('/uploadAvatarImage', function (req, res) {
     res.setHeader('Content-Length', Buffer.byteLength(body));
     res.end(body);
   }
-  //console.error("uploadAvatarImage: req.query.user_id: " + req.query.user_id);
+
+  if (req.query == undefined || req.query.userid == undefined ||
+      req.query.pwd == undefined || req.query.pwd != "whatIdummy") {
+    endCallback(null);
+    return;
+  }
+  //console.error("uploadAvatarImage: req.query.userid: " + req.query.userid);
   //console.error("uploadAvatarImage: req.files: " + JSON.stringify(req.files));
 
   var updateFunction = function() {
@@ -298,7 +329,7 @@ app.post('/uploadAvatarImage', function (req, res) {
           endCallback(null);
           return;
         }
-        userModel.updateAvatarURL(req.query.user_id,"http://54.213.19.254:6699/uploads/"+req.files.file.name,endCallback);
+        userModel.updateAvatarURL(req.query.userid,"http://54.213.19.254:6699/uploads/"+req.files.file.name,endCallback);
         //update user avatar url in database
         console.log("Upload completed!");
       });
@@ -329,7 +360,7 @@ app.post('/uploadAvatarImage', function (req, res) {
 
   if (req.query.only_is_empty && req.query.only_is_empty=="true") {
     console.log("calling userModel.checkIsEmptyAvatarUrl");
-    userModel.checkIsEmptyAvatarUrl(req.query.user_id,checkEndCallback);
+    userModel.checkIsEmptyAvatarUrl(req.query.userid,checkEndCallback);
   }
   else {
     console.log("calling updateFunction");
