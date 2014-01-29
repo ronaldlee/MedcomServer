@@ -76,38 +76,6 @@ UserModel.prototype.checkUser = function(phone,callback,index,endCallback) {
 
 };
 
-UserModel.prototype.checkIsEmptyAvatarUrl = function(user_id,endCallback) {
-  var sql="select avatar_url from user where user_id='"+user_id+"'";
-
-  this.pool.getConnection(function(err, connection) {
-    connection.query(sql, function(err, rows) {
-      connection.release();
-
-      if (err) {
-        endCallback(false);
-        return;
-      }
-
-      if (rows.length == 0) {
-        endCallback(false);
-        return;
-      }
-      else {
-        if (rows[0]['avatar_url'] == "") {
-          endCallback(true);
-          return;
-        }
-        else {
-          endCallback(false);
-          return;
-        }
-      }
-      endCallback(false);
-      return;
-    });
-  });
-};
-
 UserModel.prototype.getPhoneByUserID = function(user_id,callback) {
   var sql="select phone from user where user_id='"+user_id+"'";
 

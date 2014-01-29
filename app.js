@@ -345,27 +345,8 @@ app.post('/uploadAvatarImage', function (req, res) {
     }
   }
 
-  var checkEndCallback = function(isEmptyAvatarUrl) {
-    console.log("call checkEndCallback");
-    if (isEmptyAvatarUrl == true) {
-      console.log(" --isEmptyAvatarUrl is true: call updateFunction");
-      //do update
-      updateFunction();
-    }
-    else {
-      console.log(" --isEmptyAvatarUrl is false: call endCallback");
-      endCallback();
-    }
-  }
-
-  if (req.query.only_is_empty && req.query.only_is_empty=="true") {
-    console.log("calling userModel.checkIsEmptyAvatarUrl");
-    userModel.checkIsEmptyAvatarUrl(req.query.userid,checkEndCallback);
-  }
-  else {
-    console.log("calling updateFunction");
-    updateFunction();
-  }
+  console.log("calling updateFunction");
+  updateFunction();
 
 });
 
