@@ -107,7 +107,7 @@ app.post('/getUser',function(req,res) {
   var endCallback = function(user) {
     var response = {};
     response['code'] = "0";
-    if (!phone) {
+    if (!user) {
       response['code'] = "-1";
     }
     response['user'] = user;
