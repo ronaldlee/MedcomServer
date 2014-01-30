@@ -332,6 +332,7 @@ app.post('/uploadAvatarImage', function (req, res) {
         userModel.updateAvatarURL(req.query.userid,"http://54.213.19.254:6699/uploads/"+req.files.file.name,endCallback);
         //update user avatar url in database
         console.log("Upload completed!");
+        endCallback(req.query.userid);
       });
     } else {
       fs.unlink(tempPath, function () {
@@ -348,6 +349,65 @@ app.post('/uploadAvatarImage', function (req, res) {
   console.log("calling updateFunction");
   updateFunction();
 
+});
+
+app.post('/uploadGroupImage', function (req, res) {
+
+  console.log("call uploadGroupImage");
+
+  var endCallback = function(url) {
+    console.log("call endCallback");
+    var response = {};
+    response['code'] = "0";
+    if (!url) {
+      response['code'] = "-1";
+    }
+    else {
+      response['url'] = url;
+    }
+    var body = JSON.stringify(response);
+
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Content-Length', Buffer.byteLength(body));
+    res.end(body);
+  }
+
+  if (req.query == undefined ||
+      req.query.pwd == undefined || req.query.pwd != "whatIdummy") {
+    endCallback(null);
+    return;
+  }
+
+  var updateFunction = function() {
+    var tempPath = req.files.file.path;
+    var targetFilename = '/home/ubuntu/public/uploads/groups/'+req.files.file.name;
+    var url = 'http://54.213.19.254:6699/uploads/groups/'+req.files.file.name;
+
+    console.error("upload group tempfile: " + tempPath + "; target file: " + targetFilename);
+
+    var targetPath = path.resolve(targetFilename);
+
+    if (path.extname(req.files.file.name).toLowerCase() === '.png') {
+      fs.rename(tempPath, targetPath, function(err) {
+        if (err) {
+          console.log("upload error: " + err);
+          endCallback(null);
+          return;
+        }
+        endCallback(url);
+      });
+    } else {
+      fs.unlink(tempPath, function () {
+        if (err) {
+          endCallback(null);
+          return;
+        }
+        console.error("Only .png files are allowed!");
+        endCallback(null);
+      });
+    }
+  }
+  updateFunction();
 });
 
 
