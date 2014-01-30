@@ -332,7 +332,6 @@ app.post('/uploadAvatarImage', function (req, res) {
         userModel.updateAvatarURL(req.query.userid,"http://54.213.19.254:6699/uploads/"+req.files.file.name,endCallback);
         //update user avatar url in database
         console.log("Upload completed!");
-        endCallback(req.query.userid);
       });
     } else {
       fs.unlink(tempPath, function () {
