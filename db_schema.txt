@@ -1,0 +1,14 @@
+CREATE TABLE `user` (
+  `user_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `intro` varchar(100) NOT NULL DEFAULT '',
+  `phone` char(20) NOT NULL DEFAULT '',
+  `openudid` varchar(100) NOT NULL DEFAULT '',
+  `avatar_url` varchar(100) NOT NULL DEFAULT '',
+  `calling_code` smallint(5) unsigned NOT NULL DEFAULT '0',
+  `status` tinyint(3) unsigned DEFAULT '0',
+  `create_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `last_play_date` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`user_id`),
+  UNIQUE KEY `phone` (`phone`),
+  UNIQUE KEY `openudid` (`openudid`)
+) ENGINE=InnoDB AUTO_INCREMENT=290 DEFAULT CHARSET=utf8
