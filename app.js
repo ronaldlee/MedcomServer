@@ -48,10 +48,14 @@ app.post('/log',function(req,res) {
 });
 
 app.post('/date',function(req,res) {
-  var millsecs = (new Date).getTime();
+  var response = {};
+  response['code'] = "0";
+  response['date'] = (new Date).getTime();
+  var body = JSON.stringify(response);
+
   res.setHeader('Content-Type', 'application/json');
   res.setHeader('Content-Length', Buffer.byteLength(body));
-  res.end(millsecs);
+  res.end(body);
 });
 
 app.post('/registerUser',function(req,res) {
