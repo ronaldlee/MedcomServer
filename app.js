@@ -47,6 +47,13 @@ app.post('/log',function(req,res) {
   console.log(getFormattedCurrentDate()+":req body: " + JSON.stringify(req.body));
 });
 
+app.post('/date',function(req,res) {
+  var millsecs = (new Date).getTime();
+  res.setHeader('Content-Type', 'application/json');
+  res.setHeader('Content-Length', Buffer.byteLength(body));
+  res.end(millsecs);
+});
+
 app.post('/registerUser',function(req,res) {
   console.log(getFormattedCurrentDate()+":registerUser: " + JSON.stringify(req.body));
 
