@@ -58,6 +58,22 @@ app.post('/date',function(req,res) {
   res.end(body);
 });
 
+app.post('/isInvited',function(req,res) {
+  var pwd = req.body.pwd;
+
+  var isok = "-1";
+  if (pwd == "92374900" || pwd == "23423010") {
+    isok = "0";
+  }
+
+  var response = {};
+  response['code'] = isok;
+  var body = JSON.stringify(response);
+  res.setHeader('Content-Type', 'application/json');
+  res.setHeader('Content-Length', Buffer.byteLength(body));
+  res.end(body);
+});
+
 app.post('/registerUser',function(req,res) {
   console.log(getFormattedCurrentDate()+":registerUser: " + JSON.stringify(req.body));
 
