@@ -58,6 +58,17 @@ app.post('/date',function(req,res) {
   res.end(body);
 });
 
+app.post('/needInvite',function(req,res) {
+  var isok = "0"; //0 = false
+
+  var response = {};
+  response['code'] = isok;
+  var body = JSON.stringify(response);
+  res.setHeader('Content-Type', 'application/json');
+  res.setHeader('Content-Length', Buffer.byteLength(body));
+  res.end(body);
+});
+
 app.post('/isInvited',function(req,res) {
   var pwd = req.body.pwd;
 
